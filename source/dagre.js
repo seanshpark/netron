@@ -1585,13 +1585,22 @@ dagre.layout = (graph, layout) => {
                     while (stack.length > 0) {
                         const v = stack.pop();
                         if (visited.has(v)) {
-                            let min = Number.POSITIVE_INFINITY;
+                            let minOut = Number.POSITIVE_INFINITY;
+                            let minIn = Number.POSITIVE_INFINITY;
                             for (const e of blockG.node(v).out) {
-                                min = Math.min(min, xs[e.w] - e.label);
+                                minOut = Math.min(minOut, xs[e.w] - e.label);
+                            }
+                            for (const e of blockG.node(v).in) {
+                                minIn = Math.min(minIn, xs[e.w] - e.label);
                             }
                             const label = g.node(v).label;
-                            if (min !== Number.POSITIVE_INFINITY && label.borderType !== borderType) {
-                                xs[v] = Math.max(xs[v], min);
+                            if (minOut !== Number.POSITIVE_INFINITY && minIn !== Number.NEGATIVE_INFINITY &&
+                                label.borderType !== borderType) {
+                                if (Math.abs(xs[v] - minOut) < Math.abs(xs[v] - minIn)) {
+                                    xs[v] = Math.max(xs[v], minOut);
+                                } else {
+                                    xs[v] = Math.max(xs[v], minIn);
+                                }
                             }
                         } else {
                             visited.add(v);
@@ -1740,7 +1749,7 @@ dagre.layout = (graph, layout) => {
                 for (const [v, x] of Object.entries(xs)) {
                     const halfWidth = g.node(v).label.width / 2;
                     max = Math.max(x + halfWidth, max);
-                    min = Math.min(x - halfWidth, min);
+                    min = Math.min(Math.max(0, x - halfWidth), min);
                 }
                 const width = max - min;
                 if (width < minWidth) {
