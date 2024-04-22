@@ -75,6 +75,7 @@ dagre.layout = (nodes, edges, layout, state) => {
             const label = node.label;
             const rank = label.rank;
             if (rank !== undefined) {
+                //console.log("!!!", node.v, label.width, label.height, rank, label.order);
                 layering[rank][label.order] = node.v;
             }
         }
@@ -1644,9 +1645,12 @@ dagre.layout = (nodes, edges, layout, state) => {
                     if (visited.has(v)) {
                         let min = Number.POSITIVE_INFINITY;
                         for (const e of blockG.node(v).out) {
+                            //console.log("!!! ", e.w, xs[e.w], e.label);
                             min = Math.min(min, xs[e.w] - e.label);
                         }
                         const label = g.node(v).label;
+                        if (label.dummy)
+                            continue;
                         if (min !== Number.POSITIVE_INFINITY && label.borderType !== borderType) {
                             xs[v] = Math.max(xs[v], min);
                         }
@@ -1661,6 +1665,12 @@ dagre.layout = (nodes, edges, layout, state) => {
             }
             // Assign x coordinates to all nodes
             for (const v of Object.values(align)) {
+                //const label = g.node(v).label;
+                //console.log("v=", v, "root[v]=", root[v], "xs[root[v]]=", xs[root[v]]);
+                //let ooo = g.node(v);
+                //for (let prop in ooo) {
+                //    console.log(prop, ",");
+                //}
                 xs[v] = xs[root[v]];
             }
             return xs;
@@ -1796,7 +1806,7 @@ dagre.layout = (nodes, edges, layout, state) => {
             for (const [v, x] of Object.entries(xs)) {
                 const halfWidth = g.node(v).label.width / 2;
                 max = Math.max(x + halfWidth, max);
-                min = Math.min(x - halfWidth, min);
+                min = Math.min(Math.max(0, x - halfWidth), min);
             }
             const width = max - min;
             if (width < minWidth) {
@@ -2058,11 +2068,11 @@ dagre.layout = (nodes, edges, layout, state) => {
         acyclic_undo
     ];
     while (tasks.length > 0) {
-        // const start = Date.now();
+        const start = Date.now();
         const task = tasks.shift();
         task(g, state, layout);
-        // const duration = Date.now() - start;
-        // console.log(`${task.name}: ${duration}ms`);
+        const duration = Date.now() - start;
+        console.log(`${task.name}: ${duration}ms`);
     }
 
     // Update source graph

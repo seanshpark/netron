@@ -687,6 +687,7 @@ base.Telemetry = class {
     }
 
     send(name, params) {
+        return;
         if (this._session) {
             try {
                 params = { event_name: name, ...this._metadata, ...params };

@@ -276,6 +276,7 @@ app.Application = class {
     }
 
     async _checkForUpdates() {
+        return;
         if (!electron.app.isPackaged) {
             return;
         }
