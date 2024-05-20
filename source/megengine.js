@@ -467,9 +467,11 @@ megengine.Graph = class {
 
 megengine.Argument = class {
 
-    constructor(name, value) {
+    constructor(name, value, type, visible) {
         this.name = name;
         this.value = value;
+        this.type = type || null;
+        this.visible = visible !== false;
     }
 };
 
@@ -510,15 +512,15 @@ megengine.Node = class {
             const inputSchemas = this.type && this.type.inputs ? [...this.type.inputs] : [];
             for (let i = 0; i < obj.inputs.length; i++) {
                 const inputOpr = allOprAndTensor.get(obj.inputs[i]);
-                const inputSchema = inputSchemas.length > 0 ? inputSchemas.shift() : { name: `input${i === 0 ? '' : i.toString()}` };
-                const argument = new megengine.Argument(inputSchema.name, inputOpr.extraInfo.args);
+                const schema = inputSchemas.length > 0 ? inputSchemas.shift() : { name: `input${i === 0 ? '' : i.toString()}` };
+                const argument = new megengine.Argument(schema.name, inputOpr.extraInfo.args);
                 this.inputs.push(argument);
             }
             const outputSchemas = this.type && this.type.outputs ? [...this.type.outputs] : [];
             for (let i = 0; i < obj.outputs.length; i++) {
                 const outputOpr = allOprAndTensor.get(obj.outputs[i]);
-                const outputSchema = outputSchemas.length > 0 ? outputSchemas.shift() : { name: `output${i === 0 ? '' : i.toString()}` };
-                const argument = new megengine.Argument(outputSchema.name, outputOpr.extraInfo.args);
+                const schema = outputSchemas.length > 0 ? outputSchemas.shift() : { name: `output${i === 0 ? '' : i.toString()}` };
+                const argument = new megengine.Argument(schema.name, outputOpr.extraInfo.args);
                 this.outputs.push(argument);
             }
             if (obj.param) {
