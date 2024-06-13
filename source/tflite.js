@@ -481,7 +481,7 @@ tflite.Tensor = class {
 tflite.TensorType = class {
 
     constructor(tensor, denotation) {
-        let shape_from = tensor.shape_signature.length > 0 ? tensor.shape_signature : tensor.shape;
+        const shape_from = tensor.shape_signature.length > 0 ? tensor.shape_signature : tensor.shape;
         this.dataType = tflite.Utility.dataType(tensor.type);
         this.shape = new tflite.TensorShape(Array.from(shape_from || []));
         this.denotation = denotation;
