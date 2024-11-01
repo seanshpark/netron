@@ -289,22 +289,6 @@ app.Application = class {
     }
 
     async _checkForUpdates() {
-        if (!electron.app.isPackaged) {
-            return;
-        }
-        const updater = await import('electron-updater');
-        const autoUpdater = updater.default.autoUpdater;
-        if (autoUpdater.app && autoUpdater.app.appUpdateConfigPath && !fs.existsSync(autoUpdater.app.appUpdateConfigPath)) {
-            return;
-        }
-        const promise = autoUpdater.checkForUpdates();
-        if (promise) {
-            promise.catch((error) => {
-                /* eslint-disable no-console */
-                console.log(error.message);
-                /* eslint-enable no-console */
-            });
-        }
     }
 
     _about() {

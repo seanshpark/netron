@@ -267,6 +267,9 @@ host.BrowserHost = class {
     }
 
     async request(file, encoding, base) {
+        // !!!
+        console.log(`host.BrowserHost ${file}, ${encoding}, ${base}`);
+
         const url = base ? (`${base}/${file}`) : this._url(file);
         if (base === null) {
             this._requests = this._requests || new Map();
@@ -558,7 +561,11 @@ host.BrowserHost = class {
     }
 
     async message(message, alert, action) {
+        // !!!
+        console.log(`host.BrowserHost message: ${message} ${action}`);
+
         return new Promise((resolve) => {
+            console.log(`host.BrowserHost message Promise: ${message} ${action}`);
             const type = this.document.body.getAttribute('class');
             this._element('message-text').innerText = message || '';
             const button = this._element('message-button');
@@ -607,6 +614,9 @@ host.BrowserHost.BrowserFileContext = class {
     }
 
     async request(file, encoding, basename) {
+        // !!!
+        console.log(`host.BrowserHost.BrowserFileContext ${file}, ${encoding}, ${basename}`);
+
         if (basename !== undefined) {
             return this._host.request(file, encoding, basename);
         }
@@ -821,6 +831,9 @@ host.BrowserHost.Context = class {
     }
 
     async request(file, encoding, base) {
+        // !!!
+        console.log(`host.BrowserHost.Context ${file}, ${encoding}, ${base}`);
+
         base = base === undefined ? this._base : base;
         return this._host.request(file, encoding, base);
     }

@@ -2,20 +2,26 @@
 name: Build
 
 on:
-  push:
-    branches: [ '**' ]
-    tags-ignore: [ '**' ]
-  pull_request:
-    branches: [ main ]
+  #push:
+  #  branches: [ '**' ]
+  #  tags-ignore: [ '**' ]
+  #pull_request:
+  #  branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      os:
+        type: choice
+        required: true
+        default: 'windows-latest'
+        options:
+        - macos-latest
+        - ubuntu-latest
+        - windows-latest
 
 jobs:
   build:
     name: Build
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ macos-latest, ubuntu-latest, windows-latest ]
+    runs-on: ${{ github.event.inputs.os }}
 
     steps:
       - name: Clone Git repository
@@ -44,7 +50,7 @@ jobs:
         shell: bash
         run: |
           npx electron-builder install-app-deps
-          case "${{ matrix.os }}" in
+          case "${{ github.event.inputs.os }}" in
             macos*)
               CSC_IDENTITY_AUTO_DISCOVERY=false npx electron-builder --mac --universal --publish never -c.mac.identity=null
               ;;
@@ -57,29 +63,29 @@ jobs:
               ;;
           esac
 
-  analyze:
-    name: Analyze
-    runs-on: ubuntu-latest
-
-    permissions:
-      security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'javascript', 'python' ]
-
-    steps:
-      - name: Clone Git repository
-        uses: actions/checkout@v4
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+      - name: Upload MacOS
+        if: ${{ startsWith(github.event.inputs.os,'macos') }}
+        uses: Actions/upload-artifact@v4
         with:
-          languages: ${{ matrix.language }}
+          name: Netron-MacOS
+          path: dist/*.dmg
+          #dist/pypi/*.whl
+          retention-days: 1
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+      - name: Upload Ubuntu
+        if: ${{ startsWith(github.event.inputs.os,'ubuntu') }}
+        uses: Actions/upload-artifact@v4
+        with:
+          name: Netron-Ubuntu
+          path: dist/*.AppImage
+          # dist/pypi/*.whl
+          retention-days: 1
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+      - name: Upload Windows
+        if: ${{ startsWith(github.event.inputs.os,'windows') }}
+        uses: Actions/upload-artifact@v4
+        with:
+          name: Netron-Windows
+          path: dist/*.exe
+          # dist/pypi/*.whl
+          retention-days: 1

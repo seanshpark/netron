@@ -1736,7 +1736,8 @@ pytorch.Execution = class extends python.Execution {
         return type;
     }
 
-    target(expression, context) {
+    target(expression, context, resolve) {
+        resolve = resolve === false ? false : true;
         if (expression.type === 'id') {
             switch (expression.value) {
                 case 'torch':
@@ -1783,7 +1784,7 @@ pytorch.Execution = class extends python.Execution {
                     break;
                 }
             }
-            if (!target) {
+            if (!target && resolve) {
                 path.reverse();
                 const name = path.join('.');
                 const file = `${path.join('/')}.py`;
@@ -1793,7 +1794,7 @@ pytorch.Execution = class extends python.Execution {
                 return this.resolve(name);
             }
         }
-        return super.target(expression, context);
+        return super.target(expression, context, resolve);
     }
 
     expression(expression, context) {

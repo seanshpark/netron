@@ -981,8 +981,11 @@ onnx.Context.Model = class {
     }
 
     location(name, offset, length) {
+        console.log(`onnx.Context.Model location: ${name}, ${offset}, ${length}`);
         if (this._locations.has(name)) {
             const stream = this._locations.get(name);
+            // !!!
+            console.log(`onnx.Context.Model location: ${Object.getOwnPropertyNames(stream)}`);
             if (offset >= 0 && (offset + length) <= stream.length) {
                 try {
                     const position = stream.position;
@@ -1657,6 +1660,7 @@ onnx.ProtoReader = class {
                 location(tensor.indices);
                 location(tensor.indices);
             } else if (tensor.data_location === onnx.DataLocation.EXTERNAL && Array.isArray(tensor.external_data)) {
+                // !!!
                 for (const entry of tensor.external_data) {
                     if (entry.key === 'location') {
                         locations.add(entry.value);
@@ -1710,10 +1714,20 @@ onnx.ProtoReader = class {
             locations.delete(key);
         }
         const keys = Array.from(locations);
-        const promises = keys.map((location) => this.context.fetch(location));
+        // !!!
+        //const promises = keys.map((location) => this.context.fetch(location));
+        const promises = keys.map((location) => {
+            // console.log(`onnx.ProtoReader fetch2 '${location}'`);
+            return this.context.fetch2(location);
+        });
+        //console.log(`promices: ${typeof promises}, ${Object.getOwnPropertyNames(promises)}`);
+
         const streams = await Promise.all(promises.map((promise) => promise.then((context) => context.stream).catch(() => null)));
+        //console.log(`streams: ${typeof streams}, ${Object.getOwnPropertyNames(streams)}`);
+
         for (let i = 0; i < keys.length; i++) {
             if (streams[i] !== null) {
+                //console.log(`onnx.ProtoReader read: ${keys[i]}, [${Object.getOwnPropertyNames(streams[i])}], ${streams[i].name}, ${streams[i].length}`);
                 this.locations.set(keys[i], streams[i]);
             }
         }
@@ -2969,6 +2983,7 @@ onnx.DataReader = class {
     }
 
     async read() {
+        console.log(`onnx.DataReader ${this.identifier}`);
         const file = this.identifier.substring(0, this.identifier.length - 5);
         const context = await this.context.fetch(file);
         const reader = new onnx.ProtoReader(context, 'binary', 'model');

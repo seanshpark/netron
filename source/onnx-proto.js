@@ -652,9 +652,11 @@ onnx.GraphProto = class GraphProto {
                     message.name = reader.string();
                     break;
                 case 5:
+                    //reader.skip(reader.uint32());
                     message.initializer.push(onnx.TensorProto.decode(reader, reader.uint32()));
                     break;
                 case 15:
+                    //reader.skip(reader.uint32());
                     message.sparse_initializer.push(onnx.SparseTensorProto.decode(reader, reader.uint32()));
                     break;
                 case 10:
@@ -761,12 +763,15 @@ onnx.TensorProto = class TensorProto {
                     message.segment = onnx.TensorProto.Segment.decode(reader, reader.uint32());
                     break;
                 case 4:
+                    //reader.skip(reader.int64());
                     message.float_data = reader.floats(message.float_data, tag);
                     break;
                 case 5:
+                    //reader.skip(reader.int32());
                     message.int32_data = reader.array(message.int32_data, () => reader.int32(), tag);
                     break;
                 case 6:
+                    //reader.skip(reader.uint32());
                     message.string_data.push(reader.bytes());
                     break;
                 case 7:

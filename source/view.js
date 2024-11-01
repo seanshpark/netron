@@ -697,6 +697,9 @@ view.View = class {
     }
 
     accept(file, size) {
+        // !!!
+        console.log(`view.View accept ${file} , ${size}`);
+
         return this._modelFactoryService.accept(file, size);
     }
 
@@ -1726,6 +1729,8 @@ view.Worker = class {
     }
 
     async request(message, delay, notification) {
+        // !!!
+        console.log(`view.Worker request: ${message}, ${delay}`);
         this._timeout = -1;
         return new Promise((resolve, reject) => {
             this._resolve = resolve;
@@ -5295,12 +5300,24 @@ view.Context = class {
     }
 
     async request(file) {
+        console.log(`view.Context request: ${file}`);
         return this._context.request(file, 'utf-8', null);
     }
 
     async fetch(file) {
         const stream = await this._context.request(file, null, this._base);
         return new view.Context(this, file, stream, new Map());
+    }
+
+    // !!!
+    async fetch2(file) {
+        console.log(`view.Context fetch2 1: ${file} ${this._base}`);
+        // !!! this._context.request is Promise
+        const stream = await this._context.request(file, null, this._base);
+        // !!! stream will be available after loading the file
+        let ret = new view.Context(this, file, stream, new Map());
+        console.log("view.Context fetch2 2");
+        return ret;
     }
 
     async require(id) {
@@ -5690,6 +5707,9 @@ view.EntryContext = class {
     }
 
     async request(file, encoding, base) {
+        // !!!
+        console.log(`view.EntryContext request ${file}, ${encoding}, ${base}`);
+
         if (base === null) {
             return this._host.request(file, encoding, base);
         }
@@ -6123,6 +6143,10 @@ view.ModelFactoryService = class {
     }
 
     async _openContext(context) {
+        // !!!
+        // context is view.Context
+        console.log(`view.ModelFactoryService _openContext: ${context} ${Object.getOwnPropertyNames(context)}`); // ${JSON.stringify(context)}
+
         const modules = this._filter(context).filter((module) => module && module.length > 0);
         const errors = [];
         for (const module of modules) {

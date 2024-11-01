@@ -1210,26 +1210,7 @@ base.Telemetry = class {
     }
 
     send(name, params) {
-        if (this._session) {
-            try {
-                params = { event_name: name, ...this._metadata, ...params };
-                this._metadata = {};
-                if (this._update()) {
-                    params.engagement_time_msec = this._engagement_time_msec;
-                    this._engagement_time_msec = 0;
-                }
-                const build = (entries) => entries.map(([name, value]) => `${name}=${encodeURIComponent(value)}`).join('&');
-                this._cache = this._cache || build(Array.from(this._config));
-                const key = (name, value) => this._schema.get(name) || (typeof value === 'number' && !isNaN(value) ? 'epn.' : 'ep.') + name;
-                const body = build(Object.entries(params).map(([name, value]) => [key(name, value), value]));
-                const url = `https://analytics.google.com/g/collect?${this._cache}`;
-                this._navigator.sendBeacon(url, body);
-                this._session[2] = this.get('session_engaged') || '0';
-                this.set('hit_count', this.get('hit_count') + 1);
-            } catch {
-                // continue regardless of error
-            }
-        }
+        name = params;
     }
 
     _update(focused, page, visible) {

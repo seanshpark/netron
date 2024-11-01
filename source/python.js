@@ -10821,7 +10821,8 @@ python.Execution = class {
         return undefined;
     }
 
-    target(expression, context) {
+    target(expression, context, resolve) {
+        resolve = resolve === false ? false : true;
         let current = expression;
         let path = [];
         for (;;) {
@@ -10844,7 +10845,7 @@ python.Execution = class {
                     break;
                 }
             }
-            if (!target) {
+            if (!target && resolve) {
                 path.reverse();
                 const name = path.join('.');
                 const file = `${path.join('/')}.py`;

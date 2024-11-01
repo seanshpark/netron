@@ -307,6 +307,9 @@ host.ElectronHost = class {
     }
 
     async request(file, encoding, basename) {
+        // !!!
+        console.log(`host.ElectronHost request ${file}, ${encoding}, ${basename}`);
+
         return new Promise((resolve, reject) => {
             const dirname = path.dirname(url.fileURLToPath(import.meta.url));
             const pathname = path.join(basename || dirname, file);
@@ -391,11 +394,17 @@ host.ElectronHost = class {
     }
 
     async _context(location) {
+        // !!!
+        console.log(`host.ElectronHost _context ${location}`);
+
         const basename = path.basename(location);
         const stat = fs.statSync(location);
         if (stat.isFile()) {
             const dirname = path.dirname(location);
             const stream = await this.request(basename, null, dirname);
+
+            console.log(`host.ElectronHost _context file ${dirname} ${basename}`);
+
             return new host.ElectronHost.Context(this, dirname, basename, stream);
         } else if (stat.isDirectory()) {
             const entries = new Map();
@@ -419,6 +428,9 @@ host.ElectronHost = class {
     }
 
     async _open(location) {
+        // !!!
+        console.log(`host.ElectronHost _open ${location} ${location.path}`);
+
         if (this._files) {
             this._files.push(location);
             return;
@@ -580,6 +592,9 @@ host.ElectronHost = class {
 host.ElectronHost.FileStream = class {
 
     constructor(file, start, length, mtime) {
+        // !!!
+        console.log(`!!! host.ElectronHost.FileStream ${file}, ${start}, ${length}`);
+
         this._file = file;
         this._start = start;
         this._length = length;
